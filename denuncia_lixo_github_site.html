@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LimpaBairro — Denuncie e Combata o Lixo</title>
+  <meta name="description" content="Site simples para denunciar pontos de lixo, educar a comunidade e incentivar mutirões. Pronto para GitHub Pages." />
+  <style>
+    :root{--bg:#fff8fb;--card:#ffffff;--accent:#ff6b6b;--accent2:#ffd166;--muted:#334155;--glass: rgba(3,7,18,0.03);}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,#fdfbff 0%, #f3f7ff 100%);color:var(--muted);min-height:100vh;padding:28px}
+    .container{max-width:1100px;margin:0 auto}
+    header{display:flex;align-items:center;gap:14px}
+    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:white;font-size:20px}
+    h1{margin:0;font-size:26px}
+    p.lead{margin:4px 0 18px;color:#64748b}
+
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:20px}
+    .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 8px 30px rgba(19,24,41,0.06);border:1px solid rgba(13,18,30,0.03)}
+
+    label{font-weight:700;font-size:14px}
+    input[type="text"], textarea, select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(13,18,30,0.06);margin-top:8px;font-size:14px}
+    textarea{min-height:120px}
+    .row{display:flex;gap:8px}
+    .btn{display:inline-block;padding:10px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent2));color:white;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(13,18,30,0.06);color:var(--muted)}
+
+    .reports-list{display:flex;flex-direction:column;gap:10px}
+    .report{padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.98));border:1px solid rgba(13,18,30,0.03)}
+    .meta{font-size:13px;color:#64748b}
+
+    .tips{display:flex;flex-direction:column;gap:8px}
+    .tip{padding:10px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,255,255,0.99));border:1px solid rgba(13,18,30,0.03)}
+
+    footer{margin-top:18px;font-size:13px;color:#94a3b8}
+    @media (max-width:900px){.grid{grid-template-columns:1fr} .sidebar{order:2}}
+  </style>
+</head>
+<body>
+  <!-- LimpaBairro — projeto pronto para GitHub Pages
+
+       O arquivo contém um site estático (index.html) com:
+       - Formulário para denunciar pontos de lixo (local, descrição, foto via URL)
+       - Lista local de denúncias (armazenada no localStorage do navegador)
+       - Botões para exportar denúncias (CSV) e gerar um email de denúncia pronto
+       - Seção de dicas e como organizar um mutirão
+       - Instruções no comentário abaixo para publicar no GitHub Pages
+
+       Deploy rápido:
+         1) Crie um repositório no GitHub chamado "limpabairro" (ou outro nome)
+         2) Faça upload deste index.html como arquivo raiz (ou clone e commit localmente)
+         3) No GitHub: Settings -> Pages -> Branch: main / root -> Save
+         4) Acesse https://SEU_USUARIO.github.io/NOME_DO_REPO
+
+       Se quiser, posso gerar um .zip com o arquivo ou instruções de CLI git.
+  -->
+
+  <div class="container">
+    <header>
+      <div class="logo">LB</div>
+      <div>
+        <h1>LimpaBairro</h1>
+        <p class="lead">Denuncie pontos de lixo, reúna a comunidade e organize mutirões para deixar seu bairro mais limpo.</p>
+      </div>
+    </header>
+
+    <div class="grid" style="margin-top:16px">
+      <main class="card">
+        <h3>Nova denúncia</h3>
+        <form id="reportForm">
+          <label for="place">Local (rua / ponto de referência)</label>
+          <input id="place" type="text" placeholder="Ex.: Rua das Flores, perto da escola" required />
+
+          <label for="desc">Descrição do problema</label>
+          <textarea id="desc" placeholder="O que está acontecendo? Que tipos de resíduos?" required></textarea>
+
+          <label for="photo">Foto (URL) — opcional</label>
+          <input id="photo" type="text" placeholder="Cole a URL de uma foto (ex.: Imgur / drive com link público)" />
+
+          <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+            <button class="btn" type="submit">Enviar denúncia</button>
+            <button class="btn ghost" id="clearAll" type="button">Limpar tudo</button>
+            <div style="flex:1"></div>
+            <button class="btn ghost" id="exportCsv" type="button">Exportar CSV</button>
+          </div>
+        </form>
+
+        <section style="margin-top:16px">
+          <h3 style="margin-bottom:8px">Relatórios enviados</h3>
+          <div id="reports" class="reports-list"></div>
+        </section>
+
+      </main>
+
+      <aside class="card sidebar">
+        <div class="tip">
+          <strong>Como usar</strong>
+          <p class="meta">Envie locais onde há acúmulo de lixo. As denúncias ficam salvas no seu navegador (localStorage). Use o botão Exportar CSV para enviar à prefeitura ou grupo local.</p>
+        </div>
+
+        <div class="tip">
+          <strong>Gerar email pronto</strong>
+          <p class="meta">Clique em uma denúncia e use o botão "Gerar email" para abrir seu cliente de email com assunto e corpo prontos para envio.</p>
+        </div>
+
+        <div style="margin-top:10px">
+          <h4>Dicas rápidas</h4>
+          <ul class="tips">
+            <li class="tip">Fotografe a área mostrando o problema e pontos de referência.</li>
+            <li class="tip">Reúna moradores, marque um mutirão e compartilhe nas redes locais.</li>
+            <li class="tip">Envie denúncias para a prefeitura com o CSV e fotos anexadas.</li>
+          </ul>
+        </div>
+
+        <footer>
+          Este é um protótipo educativo — para produção, integre com backend, APIs de mapas e envio automático para serviços públicos.
+        </footer>
+      </aside>
+    </div>
+  </div>
+
+<script>
+// Script simples: guarda denúncias no localStorage e permite exportar CSV / gerar e-mail
+const form = document.getElementById('reportForm');
+const reportsEl = document.getElementById('reports');
+const exportBtn = document.getElementById('exportCsv');
+const clearBtn = document.getElementById('clearAll');
+
+function loadReports(){
+  try{
+    return JSON.parse(localStorage.getItem('limpabairro_reports') || '[]');
+  }catch(e){ return []; }
+}
+function saveReports(arr){ localStorage.setItem('limpabairro_reports', JSON.stringify(arr)); }
+
+function render(){
+  const arr = loadReports();
+  reportsEl.innerHTML = '';
+  if(arr.length===0){ reportsEl.innerHTML = '<div class="report">Nenhuma denúncia ainda — seja o primeiro a enviar!</div>'; return; }
+  arr.slice().reverse().forEach((r, idx)=>{
+    const div = document.createElement('div'); div.className='report';
+    const time = new Date(r.time).toLocaleString();
+    div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${r.place}</strong><div class="meta">${time}</div></div><div><button class='btn ghost' data-index='${idx}'>Gerar email</button></div></div><p style="margin-top:8px">${r.desc}</p>${r.photo?`<img src='${r.photo}' alt='foto' style='max-width:100%;border-radius:8px;margin-top:8px'>`:''}`;
+    div.querySelector('button')?.addEventListener('click', ()=>{
+      const subject = encodeURIComponent('Denúncia: ponto de lixo — '+r.place);
+      const body = encodeURIComponent(`Olá,%0D%0A%0D%0AQuero reportar um ponto de lixo no seguinte local:%0D%0A- Local: ${r.place}%0D%0A- Descrição: ${r.desc}%0D%0A- Enviado em: ${time}%0D%0A%0D%0APeço providências.%0D%0A`);
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    });
+    reportsEl.appendChild(div);
+  });
+}
+
+form.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const place = document.getElementById('place').value.trim();
+  const desc = document.getElementById('desc').value.trim();
+  const photo = document.getElementById('photo').value.trim();
+  if(!place||!desc) return alert('Preencha local e descrição');
+  const arr = loadReports();
+  arr.push({place,desc,photo,time:Date.now()});
+  saveReports(arr);
+  form.reset();
+  render();
+});
+
+exportBtn.addEventListener('click', ()=>{
+  const arr = loadReports();
+  if(arr.length===0) return alert('Não há denúncias para exportar');
+  const csv = ['Local,Descrição,Foto,Data']
+    .concat(arr.map(r=>`"${r.place.replace(/"/g,'""')}","${r.desc.replace(/"/g,'""')}","${r.photo}","${new Date(r.time).toLocaleString()}"`))
+    .join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'denuncias_limpa_bairro.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+
+clearBtn.addEventListener('click', ()=>{
+  if(confirm('Deseja realmente apagar todas as denúncias salvas neste navegador?')){
+    localStorage.removeItem('limpabairro_reports'); render();
+  }
+});
+
+// inicializa
+render();
+</script>
+</body>
+</html>
